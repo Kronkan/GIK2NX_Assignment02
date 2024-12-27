@@ -1,15 +1,17 @@
+#:kivy 2.0.0
+
 Screen:
     HomeScreen:
         id:home
         name:'home'
-    WeatherScreen:
-        id: weather
-        name: 'weather'
+    # WeatherScreen:
+    #     id: weather
+    #     name: 'weather'
 
 <HomeScreen>:
     FloatLayout:
-
         # Text fields
+
         MDTextFieldRect:
             hint_text: 'City'
             id : city_name
@@ -27,19 +29,30 @@ Screen:
             size_hint: .3, .08
             on_release: root.search()
 
+
         MDLabel:
             text: f"Weather: {root.weather}"
-            pos_hint: {'top': 1}
+            pos_hint: {'x': 0.1, 'y': 0.5}
+            size_hint: .8, .05
             halign: "left"
-        MDLabel:
-            text: f"Visibility: {root.visibility}"
-            pos_hint: {'top': 1}
-            halign: "center"
-        MDLabel:
-            text: f"Pressure: {root.pressure}"
-            pos_hint: {'top': 1}
-            halign: "right"
+
         MDLabel:
             text: f"Humidity: {root.humidity}"
-            pos_hint: {'top': .95}
-            halign: "center"
+            pos_hint: {'x': 0.1, 'y': 0.45}
+            size_hint: .8, .05
+            halign: "left"
+
+        MDLabel:
+            text: f"Pressure: {root.pressure}"
+            pos_hint: {'x': 0.1, 'y': 0.5}
+            size_hint: .8, .05
+            halign: "right"
+
+        MDLabel:
+            text: f"Visibility: {root.visibility}"
+            pos_hint: {'x': 0.1, 'y': 0.45}
+            size_hint: .8, .05
+            halign: "right"
+
+# <WeatherScreen>:
+#     FloatLayout:

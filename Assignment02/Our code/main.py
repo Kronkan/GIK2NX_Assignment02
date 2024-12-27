@@ -1,55 +1,59 @@
+# Use https://www.wunderground.com/weather/se/borlänge for Assignment
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
+from bs4 import BeautifulSoup
 from kivy.properties import StringProperty
 import requests
-import json
 
 
 class HomeScreen(Screen):
-    firebase_url = 'https://assignment2-gik2nx-cc2bd-default-rtdb.europe-west1.firebasedatabase.app/.json'
-    flname = StringProperty()
-    age = StringProperty()
-    salary = StringProperty()
+    weather = StringProperty()
+    description = StringProperty()
+    humidity = StringProperty()
+    pressure = StringProperty()
+    visibility = StringProperty()
 
-    def create_get(self):
-        res=requests.get(url=self.firebase_url)
-        print(res.json())
+    def search(self):
+        city_name = self.ids.city_name.text
+        country_name = self.ids.country_name.text
+        
+        if not city_name or not country_name:
+            raise ValueError("City & Country must be provided.")
+        
+        try:
+            url = f'https://www.timeanddate.com/weather/{country_name}/{city_name}'
+            response = requests.get(url=url)
+            print(response.status_code)
 
-    def create_patch(self):
-        flname = self.ids.flname.text
-        age = self.ids.age.text
-        salary = self.ids.salary.text
-        print(salary)
-        json_data = '{"Table1":{"Name": "'+flname+'", "Age": "'+age+'", "Salary": "'+salary+'"}}'
-        res=requests.patch(url=self.firebase_url, json=json.loads(json_data))
-        print(res)
+            if(response.status_code == 200):           
+                soup = BeautifulSoup(response.text,'html.parser')
+                mainclass = soup.find(class_='bk-focus__qlook')
+                secondclass = soup.find(class_='bk-focus__info')
+            
+                self.weather = mainclass.find(class_='h2').get_text()
+                self.visibility = secondclass.findAll('td')[3].get_text()  # can also try slicing
+                self.pressure = secondclass.findAll('td')[4].get_text()
+                self.humidity = secondclass.findAll('td')[5].get_text()
+            else:
+                url = f'https://www.wunderground.com/weather/{country_name}/{city_name}'
+                response = requests.get(url=url)
+                print(response.status_code)
 
-    def create_post(self):
-        flname = self.ids.flname.text
-        age = self.ids.age.text
-        salary = self.ids.salary.text
-        print(salary)
-        json_data = '{"Table1":{"Name": "'+flname+'", "Age": "'+age+'", "Salary": "'+salary+'"}}'
-        res=requests.post(url=self.firebase_url, json=json.loads(json_data))
-        print(res)
+                soup = BeautifulSoup(response.text,'html.parser')
+                mainclass = soup.find(class_='bk-focus__qlook')
+                secondclass = soup.find(class_='bk-focus__info')
 
-    def create_put(self):
-        json_data = '{"Table1":{"Name": "test4", "Age": "33", "Salary": "3333"}}'
-        res=requests.put(url=self.firebase_url, json=json.loads(json_data))
-        print(res)
+                self.weather = mainclass.find(class_='h2').get_text()
+                self.visibility = secondclass.findAll('td')[3].get_text()  # can also try slicing
+                self.pressure = secondclass.findAll('td')[4].get_text()
+                self.humidity = secondclass.findAll('td')[5].get_text()
 
-    def create_delete(self):
-        delete_url = 'https://assignment2-gik2nx-cc2bd-default-rtdb.europe-west1.firebasedatabase.app/'
-        #res=requests.delete(url=delete_url+"Table1/Salary"+".json")
-        res = requests.delete(url=self.firebase_url)
-        print(res)
 
 
 class MainApp(MDApp):
     def build(self, **kwargs):
         self.theme_cls.theme_style = "Dark"
-        Window.size = (400, 600)
-
+        Window.size = (800, 1000)
 
 MainApp().run()
