@@ -39,7 +39,7 @@ class HomeScreen(Screen):
                 url = f'https://www.wunderground.com/weather/{country_name}/{city_name}'
                 response = requests.get(url=url)
                 print(response.status_code)
-
+                # Klasserna ska ha andra namn för det är en annan hemsida!!
                 soup = BeautifulSoup(response.text,'html.parser')
                 mainclass = soup.find(class_='bk-focus__qlook')
                 secondclass = soup.find(class_='bk-focus__info')
@@ -48,7 +48,9 @@ class HomeScreen(Screen):
                 self.visibility = secondclass.findAll('td')[3].get_text()  # can also try slicing
                 self.pressure = secondclass.findAll('td')[4].get_text()
                 self.humidity = secondclass.findAll('td')[5].get_text()
-
+                
+        except Exception as e:
+            self.weather = f"Error: {e}"
 
 
 class MainApp(MDApp):
