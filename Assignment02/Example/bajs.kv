@@ -1,0 +1,44 @@
+Screen:
+    HomeScreen:
+        id:home
+        name:'home'
+
+<HomeScreen>:
+    FloatLayout:
+
+        # Text fields
+        MDTextFieldRect:
+            hint_text: 'City'
+            id : city_name
+            pos_hint:{'top':.9,'left':1}
+            size_hint: .5,.06
+        MDTextFieldRect:
+            hint_text: 'Country'
+            id : country_name
+            pos_hint:{'top':.9,'right':1}
+            size_hint: .5,.06
+
+        MDRaisedButton:
+            text: "Search Weather"
+            pos_hint: {'center_x': .5, 'top': .7}
+            size_hint: .3, .08
+            on_release: root.search()
+
+        MDLabel:
+            text: f"Weather: {root.weather}"
+            pos_hint: {'top': 1}
+            halign: "left"
+        MDLabel:
+            text: f"Visibility: {root.visibility}"
+            pos_hint: {'top': 1}
+            halign: "center"
+        MDLabel:
+            text: f"Pressure: {root.pressure}"
+            pos_hint: {'top': 1}
+            halign: "right"
+        MDLabel:
+            text: f"Humidity: {root.humidity}"
+            pos_hint: {'top': .95}
+            halign: "center"
+
+
