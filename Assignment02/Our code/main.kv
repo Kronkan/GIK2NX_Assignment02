@@ -4,21 +4,16 @@ Screen:
     HomeScreen:
         id:home
         name:'home'
-    # WeatherScreen:
-    #     id: weather
-    #     name: 'weather'
-
 <HomeScreen>:
     FloatLayout:
         # Text fields
-
         MDTextFieldRect:
             hint_text: 'City'
             id : city_name
             pos_hint:{'top':.9,'left':1}
             size_hint: .5,.06
         MDTextFieldRect:
-            hint_text: 'Country'
+            hint_text: 'Country name or Country code'
             id : country_name
             pos_hint:{'top':.9,'right':1}
             size_hint: .5,.06
@@ -29,30 +24,28 @@ Screen:
             size_hint: .3, .08
             on_release: root.search()
 
-
         MDLabel:
-            text: f"Weather: {root.weather}"
+            text: f"Temperature: {root.temperature}"
             pos_hint: {'x': 0.1, 'y': 0.5}
             size_hint: .8, .05
             halign: "left"
-
+        MDLabel:
+            text: f"Description: {root.description}"
+            pos_hint: {'x': 0.1, 'y': 0.40}
+            size_hint: .8, .05
+            halign: "left"
         MDLabel:
             text: f"Humidity: {root.humidity}"
             pos_hint: {'x': 0.1, 'y': 0.45}
             size_hint: .8, .05
             halign: "left"
-
         MDLabel:
             text: f"Pressure: {root.pressure}"
             pos_hint: {'x': 0.1, 'y': 0.5}
             size_hint: .8, .05
             halign: "right"
-
         MDLabel:
             text: f"Visibility: {root.visibility}"
             pos_hint: {'x': 0.1, 'y': 0.45}
             size_hint: .8, .05
             halign: "right"
-
-# <WeatherScreen>:
-#     FloatLayout:
