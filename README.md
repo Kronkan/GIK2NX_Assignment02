@@ -7,10 +7,11 @@
 5. Your reflection on the tasks
 
 # To do list:
-- Se till så att alla typer av lagring kan nås om det behövs, se till så alla backups fungerar för att undvika errors och krascher
-- Felmedelanden
-- Kolla över när man söker på hela landet istället för endast landskoden i wunderground [/weather/sweden/kumla] ist för [/weather/se/sater], description saknas då och temperature blir "--" 
 - Eventuellt adda converters för Farenheit --> Celsius + inHG --> mBar + miles --> km (för att kringgå wunderbaums amerikanska SHIT)
 - Snygga till UI (kivy), lägga till grid exempelvis
 - Eventuell funktionalitet för om ett värde (exempelvis visibility) inte går att nås från en webbplats, hämta från backup webbplatsen istället (om timeanddate inte funkar, hämta från wunderbaum)
-- Funktionalitet för att göra om ländernas namn till country codes om det inte går att hitta
+
+- Se till så att alla typer av lagring kan nås om det behövs, se till så alla backups fungerar för att undvika errors och krascher
+- Felmedelanden CHECK
+- Kolla över när man söker på hela landet istället för endast landskoden i wunderground [/weather/sweden/kumla] ist för [/weather/se/sater], description saknas då och temperature blir "--" CHECK! 
+- Funktionalitet för att göra om ländernas namn till country codes om det inte går att hitta CHECK!

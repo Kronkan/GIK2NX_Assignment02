@@ -4,11 +4,12 @@ from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty
 from bs4 import BeautifulSoup
+import pycountry
 import requests
 import sqlite3
 import json
 import os
-from datetime import datetime
+from datetime import date, datetime
 
 # Database setup
 db_path = "db/weather.db"
@@ -17,6 +18,9 @@ os.makedirs("db", exist_ok=True)
 # Initialize SQLite Database
 db_connection = sqlite3.connect(db_path)
 cursor = db_connection.cursor()
+cursor.execute("""
+               DROP TABLE IF EXISTS weather_data
+                """)
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS weather_data (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,7 +31,7 @@ CREATE TABLE IF NOT EXISTS weather_data (
     pressure TEXT,
     visibility TEXT,
     humidity TEXT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    timestamp DATE DEFAULT (DATE('now'))
     )
 """)
 
@@ -49,13 +53,28 @@ class HomeScreen(Screen):
     
    
     def is_db_connection_open(self):
+        """
+        Function for checking if the SQLite connection is open.
+        """
         try:
             db_connection.execute("SELECT 1")
             return True
         except sqlite3.ProgrammingError:
             return False
         except Exception:
-            return False   
+            return False
+      
+      
+    def get_country_code(self, country_name):
+        """
+        Function for getting the country code from the country name.
+        """
+        try:
+            country_code = pycountry.countries.lookup(country_name)
+            return country_code.alpha_2.lower()
+        except LookupError as e:
+            print(f"Country code not found: {e}") 
+            return country_name.lower()       
     
     
     def validate_input(self, city_name, country_name):
@@ -83,7 +102,100 @@ class HomeScreen(Screen):
             print(f"Validation error: {e}")
             return None, None 
         
-                    
+            
+    # def fetch_firebase_data(self, city_name, country_name, today_date):
+    #     """
+    #     Fetch data from Firebase.
+    #     """
+    #     try:    
+    #         print("Checking firebase for data...")
+    #         firebase_response = requests.get(firebase_url, timeout=10)
+    #         if firebase_response.status_code == 200:
+    #             firebase_data = firebase_response.json() 
+    #             for key, value in firebase_data.items():
+    #                 if value.get("city") == city_name and value.get("country") == country_name:
+    #                     firebase_timestamp = datetime.strptime(value.get("timestamp"), '%Y-%m-%d')
+    #                     if firebase_timestamp.strftime('%Y-%m-%d') < today_date:
+    #                         print("Firebase data is outdated. Scraping new data...")
+    #                         scraped_data = self.scrape_data(city_name, country_name)
+    #                         if scraped_data:
+    #                             self.update_data(city_name, country_name, scraped_data)
+    #                             self.update_UI(value)
+    #                         else:
+    #                             print("Using data from Firebase.")
+    #                             self.update_UI(value)
+
+    #         else:
+    #             print(f"Firebase request failed with status code: {firebase_response.status_code}")         
+    #     except Exception as e:
+    #         print(f"Could not fetch data from Firebase: {e}")      
+     
+     
+            
+    # def fetch_sqlite_data(self, city_name, country_name, today_date):
+    #     """
+    #     Fetch data from the SQLite database.
+    #     """
+    #     if not self.is_db_connection_open():
+    #             print("SQLite connection is closed. Attempting secondary sources...")
+    #     else:
+    #         try:
+    #             print("Checking SQLite for data...")   
+    #             cursor.execute(""" 
+    #             SELECT temperature, description, pressure, visibility, humidity
+    #             FROM weather_data
+    #             WHERE city = ? AND country = ? AND strftime('%Y-%m-%d', timestamp) = ?
+    #             """, (city_name, country_name, today_date))
+    #             existing_data = cursor.fetchone()
+            
+    #             # Display cached data in the UI if available
+    #             if existing_data:
+    #                 db_timestamp = datetime.strptime(existing_data[-1], '%Y-%m-%d')
+    #                 if db_timestamp.date() < datetime.now().date():
+    #                     print("SQLite data is outdated. Scraping new data...")
+    #                     scraped_data = self.scrape_data(city_name, country_name)
+    #                     if scraped_data:
+    #                         self.update_data(city_name, country_name, scraped_data)
+    #                         self.update_UI(scraped_data)
+    #                         print("SQLite data updated.")
+    #                 else:
+    #                     print("Using cached data from SQLite.")
+    #                     self.update_UI(existing_data)
+    #                 return
+    #         except Exception as e:
+    #             print(f"SQLite error: {e}")
+                     
+    
+    # def fetch_txtfile_data(self, city_name, country_name):
+    #     """
+    #     Fetch data from the txt file.
+    #     """
+    #     print("Checking text file for data...")
+    #     try:
+    #         with open("db/weather_data.txt", "r") as file:
+    #             for line in file:
+    #                 if not line.strip():
+    #                     continue
+    #                 data = json.loads(line.strip())
+    #                 if data["city"] == city_name and data["country"] == country_name:
+    #                     timestamp = datetime.strptime(data["timestamp"], '%Y-%m-%d')
+    #                     if timestamp.date() < datetime.now().date():
+    #                         print("Text file data is outdated. Scraping new data...")
+    #                         scraped_data = self.scrape_data(city_name, country_name)
+    #                         if scraped_data:
+    #                             self.store_data(city_name, country_name, scraped_data)
+    #                             print("Text file data updated.")
+    #                             self.update_UI(scraped_data)
+    #                     else:
+    #                         print("Using data from text file.")
+    #                         self.update_UI(data)
+    #                     return
+    #     except FileNotFoundError:
+    #         print("Text file not found.") 
+    #     except Exception as e:
+    #         print(f"Text file error: {e}")
+        
+             
     def search(self):
         """
         Search for weather data for a city and country. Check database first, scrape if not available.
@@ -94,8 +206,9 @@ class HomeScreen(Screen):
         city_name, country_name = self.validate_input(city_name, country_name)
         
         # Save the current date in the format YYYY-MM-DD
-        today_date = datetime.now().strftime('%Y-%m-%d')
-            
+        # today_date = datetime.now().strftime('%Y-%m-%d')
+        today_date = date.today()
+         
         try:    
             print("Checking firebase for data...")
             firebase_response = requests.get(firebase_url, timeout=10)
@@ -103,8 +216,8 @@ class HomeScreen(Screen):
                 firebase_data = firebase_response.json() 
                 for key, value in firebase_data.items():
                     if value.get("city") == city_name and value.get("country") == country_name:
-                        firebase_timestamp = datetime.strptime(value.get("timestamp"), '%Y-%m-%d')
-                        if firebase_timestamp.strftime('%Y-%m-%d') < today_date:
+                        firebase_timestamp = datetime.strptime(value.get("timestamp"), '%Y-%m-%d').date()
+                        if firebase_timestamp < today_date:
                             print("Firebase data is outdated. Scraping new data...")
                             scraped_data = self.scrape_data(city_name, country_name)
                             if scraped_data:
@@ -127,7 +240,7 @@ class HomeScreen(Screen):
         except Exception as e:
             print(f"Could not fetch data from Firebase: {e}")      
         
-        db_connection.close() # Test för att se vad som händer om databasen inte är åtkomlig
+        # db_connection.close() # Test för att se vad som händer om databasen inte är åtkomlig
         
         if not self.is_db_connection_open():
                 print("SQLite connection is closed. Attempting secondary sources...")
@@ -137,14 +250,15 @@ class HomeScreen(Screen):
                 cursor.execute(""" 
                 SELECT temperature, description, pressure, visibility, humidity
                 FROM weather_data
-                WHERE city = ? AND country = ? AND strftime('%Y-%m-%d', timestamp) = ?
+                WHERE city = ? AND country = ? AND timestamp = ?
                 """, (city_name, country_name, today_date))
                 existing_data = cursor.fetchone()
             
                 # Display cached data in the UI if available
                 if existing_data:
-                    db_timestamp = datetime.strptime(existing_data[-1], '%Y-%m-%d %H:%M:%S')
-                    if db_timestamp.date() < datetime.now().date():
+                    db_timestamp = datetime.strptime(existing_data[-1], '%Y-%m-%d').date()
+                    # if db_timestamp < datetime.now.date():
+                    if db_timestamp < today_date:
                         print("SQLite data is outdated. Scraping new data...")
                         scraped_data = self.scrape_data(city_name, country_name)
                         if scraped_data:
@@ -167,8 +281,9 @@ class HomeScreen(Screen):
                         continue
                     data = json.loads(line.strip())
                     if data["city"] == city_name and data["country"] == country_name:
-                        timestamp = datetime.strptime(data["timestamp"], '%Y-%m-%d %H:%M:%S')
-                        if timestamp.date() < datetime.now().date():
+                        timestamp = datetime.strptime(data["timestamp"], '%Y-%m-%d').date()
+                        # if timestamp.date() < datetime.now.date():
+                        if timestamp < today_date:
                             print("Text file data is outdated. Scraping new data...")
                             scraped_data = self.scrape_data(city_name, country_name)
                             if scraped_data:
@@ -210,8 +325,6 @@ class HomeScreen(Screen):
             #         """, (city_name, country_name))
             #         outdated_record = cursor.fetchone()
                     
-                    
-                    
             #         # Update the data if it already exists in the database but is outdated 
             #         if outdated_record:
             #             self.update_data(city_name, country_name, scraped_data)
@@ -223,67 +336,9 @@ class HomeScreen(Screen):
             #         self.update_UI(scraped_data)
                         
             # except Exception as e:
-            #     print(f"Scraping error: {e}")
-            
-                     
-    def update_UI(self, data):
-        """
-        Update the UI with the scraped weather data.
-        """
-        try:
-            if isinstance(data, dict):
-                self.temperature = data["temperature"]
-                self.description = data["description"]
-                self.pressure = data["pressure"]
-                self.visibility = data["visibility"]
-                self.humidity = data["humidity"]
-                
-            elif isinstance(data, tuple):
-                self.temperature, self.description, self.pressure, self.visibility, self.humidity = data
-                
-            else:
-                raise ValueError("Invalid data type.")
-            
-        except Exception as e:
-            print(f"UI update error: {e}")
-            
-      
-                
-    def update_data(self, city_name, country_name, scraped_data):
-        """
-        Update the weather data in the databases (SQLite, Firebase, and txt file).
-        """
-        try:
-            # Update Firebase
-            requests.patch(firebase_url, json=scraped_data, timeout=10)
-        except Exception as e:
-            print(f"Firebase update error: {e}")
-        
-        if not self.is_db_connection_open():
-            print("SQLite connection is closed. Attempting secondary sources...")
-        else:        
-            try:
-                # Update SQLite Database
-                    cursor.execute("""
-                    UPDATE weather_data 
-                    SET temperature = ?, description = ?, pressure = ?, visibility = ?, humidity = ?, timestamp = CURRENT_TIMESTAMP
-                    WHERE city = ? AND country = ?
-                    """, (scraped_data['temperature'], scraped_data['description'], scraped_data['pressure'], 
-                        scraped_data['visibility'], scraped_data['humidity'], city_name, country_name))
-                    db_connection.commit()
-            except Exception as e:
-                print(f"SQLite update error: {e}")
-    
-        # Explain why we dont update the txt file in the presentation    
-        try:
-            # "Update" the text file
-            with open("db/weather_data.txt", "a") as file:
-                file.write(json.dumps(scraped_data) + "\n")
-            print("Data successfully updated in the databases.")
-        except Exception as e:
-            print(f"Txt file update error: {e}")    
+            #     print(f"Scraping error: {e}")  
 
-                           
+                  
     def scrape_data(self, city_name, country_name):
         """
         Scrape weather data from the website for the given city & country.
@@ -319,7 +374,8 @@ class HomeScreen(Screen):
                  
             # Otherwise, if timeanddate.com fails, attempt wunderground.com 
             else:
-                url = f'https://www.wunderground.com/weather/{country_name}/{city_name}'
+                country_code = self.get_country_code(country_name)
+                url = f'https://www.wunderground.com/weather/{country_code}/{city_name}'
                 response = requests.get(url, timeout=10)
                 soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -353,12 +409,15 @@ class HomeScreen(Screen):
         # Add city, country and timestamp to the data dictionary
         data['city'] = city_name
         data['country'] = country_name
-        data['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
+        data['timestamp'] = datetime.now().strftime("%Y-%m-%d")
+      
         try:
             # Store data in Firebase
-            requests.post(firebase_url, json=data, timeout=10)
-            print("Scraped data successfully stored in Firebase.")
+            firebase_response = requests.post(firebase_url, json=data, timeout=10)
+            if firebase_response.status_code == 200:
+                print("Scraped data successfully stored in Firebase.")
+            else:
+                print(f"Firebase storage failed with status code: {firebase_response.status_code}")
         except Exception as e:
             print(f"Firebase storage error: {e}")
             
@@ -368,9 +427,11 @@ class HomeScreen(Screen):
             try:    
                 # Store data in SQLite Database
                 cursor.execute("""
-                INSERT INTO weather_data (city, country, temperature, description, pressure, visibility, humidity)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (data['city'], data['country'], data['temperature'], data['description'], data['pressure'], data['visibility'], data['humidity']))
+                INSERT INTO weather_data (city, country, temperature, description, pressure, visibility, humidity, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (data['city'], data['country'], data['temperature'], data['description'], 
+                      data['pressure'], data['visibility'], data['humidity'], data['timestamp']
+                      ))
                 db_connection.commit()
                 print("Scraped data successfully stored in SQLite.")
             except sqlite3.ProgrammingError as e:
@@ -385,6 +446,70 @@ class HomeScreen(Screen):
                 print("Scraped data successfully stored in txt file.")
         except Exception as e:
             print(f"Txt file storage error: {e}")
+    
+            
+    def update_data(self, city_name, country_name, data):
+        """
+        Update the weather data in the databases (SQLite, Firebase, and txt file).
+        """
+        # Add city, country and timestamp to the data dictionary
+        data['city'] = city_name
+        data['country'] = country_name
+        data['timestamp'] = datetime.now().strftime("%Y-%m-%d")
+        
+        try:
+            # Update Firebase
+            firebase_response = requests.patch(firebase_url, json=data, timeout=10)
+            if firebase_response.status_code == 200:
+                print("Firebase data successfully updated.")
+            else:
+                print(f"Firebase update failed with status code: {firebase_response.status_code}")
+        except Exception as e:
+            print(f"Firebase update error: {e}")
+        
+        if not self.is_db_connection_open():
+            print("SQLite connection is closed. Attempting secondary sources...")
+        else:        
+            try:
+                # Update SQLite Database
+                    cursor.execute("""
+                    UPDATE weather_data 
+                    SET temperature = ?, description = ?, pressure = ?, visibility = ?, humidity = ?, timestamp = ?
+                    WHERE city = ? AND country = ?
+                    """, (data['city'], data['country'], data['temperature'], data['description'], data['pressure'], 
+                        data['visibility'], data['humidity'], data['timestamp']
+                        ))
+                    db_connection.commit()
+            except Exception as e:
+                print(f"SQLite update error: {e}")
+    
+        # Explain why we dont update the txt file in the presentation    
+        try:
+            # "Update" the text file
+            with open("db/weather_data.txt", "a") as file:
+                file.write(json.dumps(data) + "\n")
+            print("Data successfully updated in the databases.")
+        except Exception as e:
+            print(f"Txt file update error: {e}")
+    
+            
+    def update_UI(self, data):
+        """
+        Update the UI with the scraped weather data.
+        """
+        try:
+            if isinstance(data, dict):
+                self.temperature = data["temperature"]
+                self.description = data["description"]
+                self.pressure = data["pressure"]
+                self.visibility = data["visibility"]
+                self.humidity = data["humidity"]
+            elif isinstance(data, tuple):
+                self.temperature, self.description, self.pressure, self.visibility, self.humidity = data
+            else:
+                raise ValueError("Invalid data type.")
+        except Exception as e:
+            print(f"UI update error: {e}")    
 
         
 # Main App Class
