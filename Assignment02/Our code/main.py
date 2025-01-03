@@ -18,9 +18,9 @@ os.makedirs("db", exist_ok=True)
 # Initialize SQLite Database
 db_connection = sqlite3.connect(db_path)
 cursor = db_connection.cursor()
-cursor.execute("""
-               DROP TABLE IF EXISTS weather_data
-                """)
+# cursor.execute("""
+#                DROP TABLE IF EXISTS weather_data
+#                 """)
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS weather_data (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -108,93 +108,18 @@ class HomeScreen(Screen):
     #     """
     #     Fetch data from Firebase.
     #     """
-    #     try:    
-    #         print("Checking firebase for data...")
-    #         firebase_response = requests.get(firebase_url, timeout=10)
-    #         if firebase_response.status_code == 200:
-    #             firebase_data = firebase_response.json() 
-    #             for key, value in firebase_data.items():
-    #                 if value.get("city") == city_name and value.get("country") == country_name:
-    #                     firebase_timestamp = datetime.strptime(value.get("timestamp"), '%Y-%m-%d')
-    #                     if firebase_timestamp.strftime('%Y-%m-%d') < today_date:
-    #                         print("Firebase data is outdated. Scraping new data...")
-    #                         scraped_data = self.scrape_data(city_name, country_name)
-    #                         if scraped_data:
-    #                             self.update_data(city_name, country_name, scraped_data)
-    #                             self.update_UI(value)
-    #                         else:
-    #                             print("Using data from Firebase.")
-    #                             self.update_UI(value)
-
-    #         else:
-    #             print(f"Firebase request failed with status code: {firebase_response.status_code}")         
-    #     except Exception as e:
-    #         print(f"Could not fetch data from Firebase: {e}")      
-     
-     
-            
+  
+        
     # def fetch_sqlite_data(self, city_name, country_name, today_date):
     #     """
     #     Fetch data from the SQLite database.
     #     """
-    #     if not self.is_db_connection_open():
-    #             print("SQLite connection is closed. Attempting secondary sources...")
-    #     else:
-    #         try:
-    #             print("Checking SQLite for data...")   
-    #             cursor.execute(""" 
-    #             SELECT temperature, description, pressure, visibility, humidity
-    #             FROM weather_data
-    #             WHERE city = ? AND country = ? AND strftime('%Y-%m-%d', timestamp) = ?
-    #             """, (city_name, country_name, today_date))
-    #             existing_data = cursor.fetchone()
+
             
-    #             # Display cached data in the UI if available
-    #             if existing_data:
-    #                 db_timestamp = datetime.strptime(existing_data[-1], '%Y-%m-%d')
-    #                 if db_timestamp.date() < datetime.now().date():
-    #                     print("SQLite data is outdated. Scraping new data...")
-    #                     scraped_data = self.scrape_data(city_name, country_name)
-    #                     if scraped_data:
-    #                         self.update_data(city_name, country_name, scraped_data)
-    #                         self.update_UI(scraped_data)
-    #                         print("SQLite data updated.")
-    #                 else:
-    #                     print("Using cached data from SQLite.")
-    #                     self.update_UI(existing_data)
-    #                 return
-    #         except Exception as e:
-    #             print(f"SQLite error: {e}")
-                     
-    
     # def fetch_txtfile_data(self, city_name, country_name):
     #     """
     #     Fetch data from the txt file.
     #     """
-    #     print("Checking text file for data...")
-    #     try:
-    #         with open("db/weather_data.txt", "r") as file:
-    #             for line in file:
-    #                 if not line.strip():
-    #                     continue
-    #                 data = json.loads(line.strip())
-    #                 if data["city"] == city_name and data["country"] == country_name:
-    #                     timestamp = datetime.strptime(data["timestamp"], '%Y-%m-%d')
-    #                     if timestamp.date() < datetime.now().date():
-    #                         print("Text file data is outdated. Scraping new data...")
-    #                         scraped_data = self.scrape_data(city_name, country_name)
-    #                         if scraped_data:
-    #                             self.store_data(city_name, country_name, scraped_data)
-    #                             print("Text file data updated.")
-    #                             self.update_UI(scraped_data)
-    #                     else:
-    #                         print("Using data from text file.")
-    #                         self.update_UI(data)
-    #                     return
-    #     except FileNotFoundError:
-    #         print("Text file not found.") 
-    #     except Exception as e:
-    #         print(f"Text file error: {e}")
         
              
     def search(self):
@@ -206,8 +131,7 @@ class HomeScreen(Screen):
         country_name = self.ids.country_name.text 
         city_name, country_name = self.validate_input(city_name, country_name)
         
-        # Save the current date in the format YYYY-MM-DD
-        # today_date = datetime.now().strftime('%Y-%m-%d')
+        # Save the current date for comparison with the timestamp in the databases
         today_date = date.today()
          
         try:    
@@ -224,18 +148,11 @@ class HomeScreen(Screen):
                             if scraped_data:
                                 self.update_data(city_name, country_name, scraped_data)
                                 self.update_UI(value)
-                            else:
-                                print("Using data from Firebase.")
-                                self.update_UI(value)
-                        # if(value.get("timestamp") < today_date):
-                        #     scraped_data = self.scrape_data(city_name, country_name)
-                        #     self.update_data(scraped_data)
-                        #     firebase_data = firebase_response.json()
-                        #     for key, value in firebase_data.items():
-                        #         if value.get("city") == city_name and value.get("country") == country_name:
-                        #             print("Using data from Firebase.")
-                        #             self.update_UI(value)
-                        #             return
+                        else:
+                            print("Using data from Firebase.")
+                            self.update_UI(value)
+                        return
+
             else:
                 print(f"Firebase request failed with status code: {firebase_response.status_code}")         
         except Exception as e:
@@ -299,11 +216,7 @@ class HomeScreen(Screen):
             print("Text file not found.")
         except Exception as e:
             print(f"Text file error: {e}")
-        
-        # if not self.is_db_connection_open():
-        #         print("SQLite connection is closed. Attempting secondary sources...")
-        # else:
-            # try:
+    
                 
         # If no cached data, scrape the website as a last resort
         print("No cached or up-to-date data found. Scraping new data...")
@@ -314,30 +227,6 @@ class HomeScreen(Screen):
                 self.update_UI(scraped_data)
         except Exception as e:
             print(f"Scraping error: {e}")
-                    
-            #     print("No cached or up-to-date data found. Scraping new data...")
-            #     scraped_data = self.scrape_data(city_name, country_name) 
-            
-            #     if scraped_data:
-            #         cursor.execute("""
-            #         SELECT 1
-            #         FROM weather_data
-            #         WHERE city = ? AND country = ?
-            #         """, (city_name, country_name))
-            #         outdated_record = cursor.fetchone()
-                    
-            #         # Update the data if it already exists in the database but is outdated 
-            #         if outdated_record:
-            #             self.update_data(city_name, country_name, scraped_data)
-            #         # Store new data if no record exists
-            #         else:
-            #             self.store_data(city_name, country_name, scraped_data)
-                    
-            #         # Update the UI
-            #         self.update_UI(scraped_data)
-                        
-            # except Exception as e:
-            #     print(f"Scraping error: {e}")  
 
                   
     def scrape_data(self, city_name, country_name):
@@ -411,40 +300,36 @@ class HomeScreen(Screen):
         data['city'] = city_name
         data['country'] = country_name
         data['timestamp'] = date.today().strftime("%Y-%m-%d")
-      
-        # try:
-        #     # Store data in Firebase
-        #     key = f"{city_name}_{country_name}".replace(" ", "_").lower()
-        #     firebase_response = requests.get(f'{firebase_url}/{key}.json', timeout=10)
-        #     if firebase_response.status_code == 200 and firebase_response.json() is None:
-        #         firebase_post_response = requests.post(firebase_url, json={key: data}, timeout=10)
-        #         if firebase_post_response.status_code == 200:
-        #             print("Scraped data successfully stored in Firebase.")
-        #         else:
-        #             print(f"Firebase storage failed with status code: {firebase_response.status_code}")
-        #     else:
-        #         print("Data for this city & country already exists in Firebase. Skipping insertion.")
-        # except Exception as e:
-        #     print(f"Firebase storage error: {e}")
             
         try:
             # Store data in Firebase
             firebase_response = requests.get(firebase_url, timeout=10)
+            
             if firebase_response.status_code == 200:
                 firebase_data = firebase_response.json()
-                mathing_key = None
-                for key, value in firebase_data.items():
-                    if value.get("city") == city_name and value.get("country") == country_name:
-                        mathing_key = key
-                        break
-                if mathing_key:
+                matching_key = None
+                
+                if firebase_data:
+                    for key, value in firebase_data.items():
+                        if value.get("city") == city_name and value.get("country") == country_name:
+                            matching_key = key
+                            break
+                        
+                if matching_key:
                     print("Data for this city & country already exists in Firebase. Skipping insertion.")
                 else:
                     firebase_post_response = requests.post(firebase_url, json=data, timeout=10)
                     if firebase_post_response.status_code == 200:
                         print("Scraped data successfully stored in Firebase.")
                     else:
-                        print(f"Firebase storage failed with status code: {firebase_response.status_code}")
+                        print(f"Firebase storage failed with status code: {firebase_response.status_code}")        
+                        firebase_post_response = requests.post(firebase_url, json=data, timeout=10)
+                        if firebase_post_response.status_code == 200:
+                            print("Scraped data successfully stored in Firebase.")
+                        else:
+                            print(f"Firebase storage failed with status code: {firebase_response.status_code}")
+            else:
+                print(f"Firebase request failed with status code: {firebase_response.status_code}")
         except Exception as e:
             print(f"Firebase storage error: {e}")
             
@@ -492,17 +377,6 @@ class HomeScreen(Screen):
         data['city'] = city_name
         data['country'] = country_name
         data['timestamp'] = date.today().strftime("%Y-%m-%d")
-        
-        # try:
-        #     # Update Firebase
-        #     key = f"{city_name}_{country_name}".replace(" ", "_").lower()
-        #     firebase_response = requests.patch(f'{firebase_url}/{key}.json', json=data, timeout=10)
-        #     if firebase_response.status_code == 200:
-        #         print("Firebase data successfully updated.")
-        #     else:
-        #         print(f"Firebase update failed with status code: {firebase_response.status_code}")
-        # except Exception as e:
-        #     print(f"Firebase update error: {e}")
         
         try:
             # Update Firebase

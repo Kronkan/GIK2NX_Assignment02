@@ -262,3 +262,103 @@
             #     self.pressure = scraped_data["pressure"]
             #     self.visibility = scraped_data["visibility"]
             #     self.humidity = scraped_data["humidity"]
+            
+            
+                                    # if(value.get("timestamp") < today_date):
+                        #     scraped_data = self.scrape_data(city_name, country_name)
+                        #     self.update_data(scraped_data)
+                        #     firebase_data = firebase_response.json()
+                        #     for key, value in firebase_data.items():
+                        #         if value.get("city") == city_name and value.get("country") == country_name:
+                        #             print("Using data from Firebase.")
+                        #             self.update_UI(value)
+                        #             return
+                        
+        # if not self.is_db_connection_open():
+        #         print("SQLite connection is closed. Attempting secondary sources...")
+        # else:
+            # try:
+            
+            #     print("No cached or up-to-date data found. Scraping new data...")
+            #     scraped_data = self.scrape_data(city_name, country_name) 
+            
+            #     if scraped_data:
+            #         cursor.execute("""
+            #         SELECT 1
+            #         FROM weather_data
+            #         WHERE city = ? AND country = ?
+            #         """, (city_name, country_name))
+            #         outdated_record = cursor.fetchone()
+                    
+            #         # Update the data if it already exists in the database but is outdated 
+            #         if outdated_record:
+            #             self.update_data(city_name, country_name, scraped_data)
+            #         # Store new data if no record exists
+            #         else:
+            #             self.store_data(city_name, country_name, scraped_data)
+                    
+            #         # Update the UI
+            #         self.update_UI(scraped_data)
+                        
+            # except Exception as e:
+            #     print(f"Scraping error: {e}")  
+            
+                    # try:
+        #     # Store data in Firebase
+        #     key = f"{city_name}_{country_name}".replace(" ", "_").lower()
+        #     firebase_response = requests.get(f'{firebase_url}/{key}.json', timeout=10)
+        #     if firebase_response.status_code == 200 and firebase_response.json() is None:
+        #         firebase_post_response = requests.post(firebase_url, json={key: data}, timeout=10)
+        #         if firebase_post_response.status_code == 200:
+        #             print("Scraped data successfully stored in Firebase.")
+        #         else:
+        #             print(f"Firebase storage failed with status code: {firebase_response.status_code}")
+        #     else:
+        #         print("Data for this city & country already exists in Firebase. Skipping insertion.")
+        # except Exception as e:
+        #     print(f"Firebase storage error: {e}")
+            
+        # try:
+        #     # Store data in Firebase
+        #     firebase_response = requests.get(firebase_url, timeout=10)
+        #     if firebase_response.status_code == 200:
+        #         firebase_data = firebase_response.json()
+                
+        #         if not firebase_data:
+        #             firebase_post_response = requests.post(firebase_url, json=data, timeout=10)
+        #             if firebase_post_response.status_code == 200:
+        #                 print("Scraped data successfully stored in Firebase.")
+        #             else:
+        #                 print(f"Firebase storage failed with status code: {firebase_response.status_code}")
+        #         else: 
+        #             matching_key = None
+        #             for key, value in firebase_data.items():
+        #                 if value.get("city") == city_name and value.get("country") == country_name:
+        #                     matching_key = key
+        #                     break
+                        
+        #         if matching_key:
+        #             print("Data for this city & country already exists in Firebase. Skipping insertion.")
+        #         else:
+        #             firebase_post_response = requests.post(firebase_url, json=data, timeout=10)
+        #             if firebase_post_response.status_code == 200:
+        #                 print("Scraped data successfully stored in Firebase.")
+        #             else:
+        #                 print(f"Firebase storage failed with status code: {firebase_response.status_code}")
+        #     else:
+        #         print(f"Firebase request failed with status code: {firebase_response.status_code}")
+        # except Exception as e:
+        #     print(f"Firebase storage error: {e}") 
+    
+            # try:
+        #     # Update Firebase
+        #     key = f"{city_name}_{country_name}".replace(" ", "_").lower()
+        #     firebase_response = requests.patch(f'{firebase_url}/{key}.json', json=data, timeout=10)
+        #     if firebase_response.status_code == 200:
+        #         print("Firebase data successfully updated.")
+        #     else:
+        #         print(f"Firebase update failed with status code: {firebase_response.status_code}")
+        # except Exception as e:
+        #     print(f"Firebase update error: {e}")
+        
+        
