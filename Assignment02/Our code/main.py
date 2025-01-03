@@ -18,9 +18,9 @@ os.makedirs("db", exist_ok=True)
 # Initialize SQLite Database
 db_connection = sqlite3.connect(db_path)
 cursor = db_connection.cursor()
-cursor.execute("""
-               DROP TABLE IF EXISTS weather_data
-                """)
+# cursor.execute("""
+#                DROP TABLE IF EXISTS weather_data
+#                 """)
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS weather_data (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -248,10 +248,10 @@ class HomeScreen(Screen):
             try:
                 print("Checking SQLite for data...")   
                 cursor.execute(""" 
-                SELECT temperature, description, pressure, visibility, humidity
+                SELECT temperature, description, pressure, visibility, humidity, timestamp
                 FROM weather_data
                 WHERE city = ? AND country = ? AND timestamp = ?
-                """, (city_name, country_name, today_date))
+                """, (city_name, country_name, today_date.strftime('%Y-%m-%d')))
                 existing_data = cursor.fetchone()
             
                 # Display cached data in the UI if available
@@ -267,7 +267,7 @@ class HomeScreen(Screen):
                             print("SQLite data updated.")
                     else:
                         print("Using cached data from SQLite.")
-                        self.update_UI(existing_data)
+                        self.update_UI(existing_data[:-1])
                     return
             except Exception as e:
                 print(f"SQLite error: {e}")
@@ -409,7 +409,7 @@ class HomeScreen(Screen):
         # Add city, country and timestamp to the data dictionary
         data['city'] = city_name
         data['country'] = country_name
-        data['timestamp'] = datetime.now().strftime("%Y-%m-%d")
+        data['timestamp'] = date.today().strftime("%Y-%m-%d")
       
         try:
             # Store data in Firebase
@@ -455,7 +455,7 @@ class HomeScreen(Screen):
         # Add city, country and timestamp to the data dictionary
         data['city'] = city_name
         data['country'] = country_name
-        data['timestamp'] = datetime.now().strftime("%Y-%m-%d")
+        data['timestamp'] = date.today().strftime("%Y-%m-%d")
         
         try:
             # Update Firebase
