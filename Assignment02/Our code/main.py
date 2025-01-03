@@ -18,9 +18,9 @@ os.makedirs("db", exist_ok=True)
 # Initialize SQLite Database
 db_connection = sqlite3.connect(db_path)
 cursor = db_connection.cursor()
-# cursor.execute("""
-#                DROP TABLE IF EXISTS weather_data
-#                 """)
+cursor.execute("""
+               DROP TABLE IF EXISTS weather_data
+                """)
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS weather_data (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS weather_data (
     pressure TEXT,
     visibility TEXT,
     humidity TEXT,
-    timestamp DATE DEFAULT (DATE('now'))
+    timestamp DATE DEFAULT (DATE('now')),
+    UNIQUE(city, country)
     )
 """)
 
@@ -411,13 +412,39 @@ class HomeScreen(Screen):
         data['country'] = country_name
         data['timestamp'] = date.today().strftime("%Y-%m-%d")
       
+        # try:
+        #     # Store data in Firebase
+        #     key = f"{city_name}_{country_name}".replace(" ", "_").lower()
+        #     firebase_response = requests.get(f'{firebase_url}/{key}.json', timeout=10)
+        #     if firebase_response.status_code == 200 and firebase_response.json() is None:
+        #         firebase_post_response = requests.post(firebase_url, json={key: data}, timeout=10)
+        #         if firebase_post_response.status_code == 200:
+        #             print("Scraped data successfully stored in Firebase.")
+        #         else:
+        #             print(f"Firebase storage failed with status code: {firebase_response.status_code}")
+        #     else:
+        #         print("Data for this city & country already exists in Firebase. Skipping insertion.")
+        # except Exception as e:
+        #     print(f"Firebase storage error: {e}")
+            
         try:
             # Store data in Firebase
-            firebase_response = requests.post(firebase_url, json=data, timeout=10)
+            firebase_response = requests.get(firebase_url, timeout=10)
             if firebase_response.status_code == 200:
-                print("Scraped data successfully stored in Firebase.")
-            else:
-                print(f"Firebase storage failed with status code: {firebase_response.status_code}")
+                firebase_data = firebase_response.json()
+                mathing_key = None
+                for key, value in firebase_data.items():
+                    if value.get("city") == city_name and value.get("country") == country_name:
+                        mathing_key = key
+                        break
+                if mathing_key:
+                    print("Data for this city & country already exists in Firebase. Skipping insertion.")
+                else:
+                    firebase_post_response = requests.post(firebase_url, json=data, timeout=10)
+                    if firebase_post_response.status_code == 200:
+                        print("Scraped data successfully stored in Firebase.")
+                    else:
+                        print(f"Firebase storage failed with status code: {firebase_response.status_code}")
         except Exception as e:
             print(f"Firebase storage error: {e}")
             
@@ -427,13 +454,22 @@ class HomeScreen(Screen):
             try:    
                 # Store data in SQLite Database
                 cursor.execute("""
-                INSERT INTO weather_data (city, country, temperature, description, pressure, visibility, humidity, timestamp)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """, (data['city'], data['country'], data['temperature'], data['description'], 
-                      data['pressure'], data['visibility'], data['humidity'], data['timestamp']
-                      ))
-                db_connection.commit()
-                print("Scraped data successfully stored in SQLite.")
+                Select id FROM weather_data 
+                WHERE city = ? AND country = ?
+                """ , (city_name, country_name))
+                existing_record = cursor.fetchone()
+                if existing_record:
+                    print("Data for this city & country already exists in SQLite. Skipping insertion.")
+                    return
+                else:
+                    cursor.execute("""
+                    INSERT INTO weather_data (city, country, temperature, description, pressure, visibility, humidity, timestamp)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (data['city'], data['country'], data['temperature'], data['description'], 
+                        data['pressure'], data['visibility'], data['humidity'], data['timestamp']
+                        ))
+                    db_connection.commit()
+                    print("Scraped data successfully stored in SQLite.")
             except sqlite3.ProgrammingError as e:
                 print(f"SQLite storage error: {e} - Connection may be closed.")
             except Exception as e: 
@@ -457,15 +493,41 @@ class HomeScreen(Screen):
         data['country'] = country_name
         data['timestamp'] = date.today().strftime("%Y-%m-%d")
         
+        # try:
+        #     # Update Firebase
+        #     key = f"{city_name}_{country_name}".replace(" ", "_").lower()
+        #     firebase_response = requests.patch(f'{firebase_url}/{key}.json', json=data, timeout=10)
+        #     if firebase_response.status_code == 200:
+        #         print("Firebase data successfully updated.")
+        #     else:
+        #         print(f"Firebase update failed with status code: {firebase_response.status_code}")
+        # except Exception as e:
+        #     print(f"Firebase update error: {e}")
+        
         try:
             # Update Firebase
-            firebase_response = requests.patch(firebase_url, json=data, timeout=10)
+            firebase_response = requests.get(firebase_url, timeout=10)
             if firebase_response.status_code == 200:
-                print("Firebase data successfully updated.")
+                firebase_data = firebase_response.json()
+                mathing_key = None
+                for key, value in firebase_data.items():
+                    if value.get("city") == city_name and value.get("country") == country_name:
+                        mathing_key = key
+                        break
+                
+                if mathing_key:
+                    firebase_response = requests.patch(f'{firebase_url}/{mathing_key}.json', json=data, timeout=10)
+                    if firebase_response.status_code == 200:
+                        print("Firebase data successfully updated.")
+                    else:
+                        print(f"Firebase update failed with status code: {firebase_response.status_code}")
+                else:
+                    print("Data for this city & country does not exist in Firebase. Skipping update.")
             else:
-                print(f"Firebase update failed with status code: {firebase_response.status_code}")
+                print(f"Firebase request failed with status code: {firebase_response.status_code}") 
         except Exception as e:
             print(f"Firebase update error: {e}")
+            
         
         if not self.is_db_connection_open():
             print("SQLite connection is closed. Attempting secondary sources...")
@@ -476,10 +538,10 @@ class HomeScreen(Screen):
                     UPDATE weather_data 
                     SET temperature = ?, description = ?, pressure = ?, visibility = ?, humidity = ?, timestamp = ?
                     WHERE city = ? AND country = ?
-                    """, (data['city'], data['country'], data['temperature'], data['description'], data['pressure'], 
-                        data['visibility'], data['humidity'], data['timestamp']
+                    """, (data['temperature'], data['description'], data['pressure'], 
+                        data['visibility'], data['humidity'], data['timestamp'], data['city_name'], data['country_name']
                         ))
-                    db_connection.commit()
+                    db_connection.commit() 
             except Exception as e:
                 print(f"SQLite update error: {e}")
     

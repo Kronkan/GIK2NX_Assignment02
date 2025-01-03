@@ -1,4 +1,4 @@
 
-{"temperature": "17\u00a0\u00b0F", "description": "Tomorrow's temperature is forecast to be COOLER than today.", "pressure": "29.36\u00a0in", "visibility": "7\u00a0miles", "humidity": "77\u00a0%", "city": "sater", "country": "sweden", "timestamp": "2025-01-02"}
-{"temperature": "1\u00a0\u00b0F", "description": "Today's temperature is forecast to be MUCH COOLER than yesterday.", "pressure": "29.32\u00a0in", "visibility": "6\u00a0miles", "humidity": "97\u00a0%", "city": "sater", "country": "sweden", "timestamp": "2025-01-03"}
-{"temperature": "1\u00a0\u00b0F", "description": "Today's temperature is forecast to be MUCH COOLER than yesterday.", "pressure": "29.32\u00a0in", "visibility": "6\u00a0miles", "humidity": "97\u00a0%", "city": "sater", "country": "sweden", "timestamp": "2025-01-03"}
+{"temperature": "8\u00a0\u00b0F", "description": "Today's temperature is forecast to be MUCH COOLER than yesterday.", "pressure": "29.37\u00a0in", "visibility": "5\u00a0miles", "humidity": "81\u00a0%", "city": "sater", "country": "sweden", "timestamp": "2025-01-03"}
+{"temperature": "11\u00a0\u00b0F", "description": "Today's temperature is forecast to be MUCH COOLER than yesterday.", "pressure": "29.38\u00a0in", "visibility": "0.71\u00a0miles", "humidity": "90\u00a0%", "city": "borlange", "country": "sweden", "timestamp": "2025-01-03"}
+{"temperature": "-13\u00a0\u00b0C", "description": "Sunny.", "pressure": "993 mbar", "visibility": "16\u00a0km", "humidity": "85%", "city": "orebro", "country": "sweden", "timestamp": "2025-01-03"}
