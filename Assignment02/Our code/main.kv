@@ -181,50 +181,67 @@ Screen:
         # Weather details
         GridLayout:
             cols: 2
-            size_hint_y: None
-            adaptive_size: True
-            spacing: 30
+            row_default_height: 50
+            row_force_default: True
+            spacing: 20
+            padding: [30, 20]
 
             # Temperature
-            MDLabel:
-                text: f"Temperature: {root.temperature}"
-                halign: "left"
-                valign: "middle"
+            BoxLayout:
+                orientation: 'vertical'
                 size_hint_y: None
-                #height: self.texture_size[1]
+                height: 50
+                MDLabel:
+                    text: f"Temperature: {root.temperature}"
+                    halign: "left"
+                    valign: "middle"
+                    size_hint_y: None
+                    height: self.texture_size[1]
 
             # Humidity
-            MDLabel:
-                text: f"Humidity: {root.humidity}"
-                halign: "right"
-                valign: "middle"
+            BoxLayout:
+                orientation: 'vertical'
                 size_hint_y: None
-                #height: self.texture_size[1]
+                height: 50
+                MDLabel:
+                    text: f"Humidity: {root.humidity}"
+                    halign: "right"
+                    valign: "middle"
+                    size_hint_y: None
+                    height: self.texture_size[1]
 
             # Pressure
-            MDLabel:
-                text: f"Pressure: {root.pressure}"
-                halign: "left"
-                valign: "middle"
+            BoxLayout:
+                orientation: 'vertical'
                 size_hint_y: None
-                #height: self.texture_size[1]
-                    
-            # Visibility
-            MDLabel:
-                text: f"Visibility: {root.visibility}"
-                halign: "right"
-                valign: "middle"
-                size_hint_y: None
-                #height: self.texture_size[1]
-                
-        # Description
-        BoxLayout:
-            size_hint_y: None
-            adaptive_size: True
+                height: 50
+                MDLabel:
+                    text: f"Pressure: {root.pressure}"
+                    halign: "left"
+                    valign: "middle"
+                    size_hint_y: None
+                    height: self.texture_size[1]
 
-            MDLabel:
-                text: f"Description: {root.description}"
-                halign: "left"
-                valign: "middle"
+            # Visibility
+            BoxLayout:
+                orientation: 'vertical'
                 size_hint_y: None
-                height: self.texture_size[1]
+                height: 50
+                MDLabel:
+                    text: f"Visibility: {root.visibility}"
+                    halign: "right"
+                    valign: "middle"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+            # Description spanning both columns
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 2, None
+                height: self.minimum_height
+                MDLabel:
+                    text: f"Description: {root.description}"
+                    halign: "left"
+                    valign: "middle"
+                    size_hint_y: None
+                    height: self.texture_size[1]
