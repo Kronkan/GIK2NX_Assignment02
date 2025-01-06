@@ -133,9 +133,7 @@ class HomeScreen(Screen):
             
         return fetched_data
   
-        
-         
-        
+           
     def fetch_sqlite_data(self, city_name, country_name, today_date):
         """
         Fetch data from the SQLite database.
@@ -175,9 +173,7 @@ class HomeScreen(Screen):
             
             return fetched_data
         
-        
-
-            
+                 
     def fetch_txtfile_data(self, city_name, country_name, today_date):
         """
         Fetch data from the txt file.
@@ -214,9 +210,7 @@ class HomeScreen(Screen):
         
         return fetched_data
     
-    
-        
-             
+            
     def search(self):
         """
         Search for weather data for a city and country. Check database first, scrape if not available.
@@ -249,9 +243,7 @@ class HomeScreen(Screen):
                     except Exception as e:
                         print(f"Scraping error: {e}")
                         
-                        
-
-                  
+                                    
     def scrape_data(self, city_name, country_name):
         """
         Scrape weather data from the website for the given city & country.
@@ -317,7 +309,9 @@ class HomeScreen(Screen):
      
           
     def store_data(self, city_name, country_name, data):   
-        """ Store scraped data in SQLite, Firebase, and text file."""
+        """ 
+        Store scraped data in SQLite, Firebase, and text file.
+        """
 
         # Add city, country and timestamp to the data dictionary
         data['city'] = city_name
@@ -446,7 +440,6 @@ class HomeScreen(Screen):
     
         # Explain why we dont update the txt file in the presentation    
         try:
-         # Försök till uppdatering av txtfilen
             file_path = "db/weather_data.txt"
             updated = False
             data_list = []
@@ -480,7 +473,6 @@ class HomeScreen(Screen):
         except Exception as e:
             print(f"Txt file update error: {e}")
             
-    
             
     def update_UI(self, data):
         """
@@ -500,21 +492,10 @@ class HomeScreen(Screen):
         except Exception as e:
             print(f"UI update error: {e}")
             
-            
-               
-# Ett försök men det fungerade inte :(
-color = {
-    "Dark": {
-        "200": "#343434",
-        "500": "#343434",
-        "700": "#343434",
-    }
-}
         
 # Main App Class
 class MainApp(MDApp):
     def build(self, **kwargs):
-        #self.theme_cls.theme_style = color["Dark"]
         self.theme_cls.theme_style = "Dark"
         Window.size = (500, 600)
 
