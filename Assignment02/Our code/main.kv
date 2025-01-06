@@ -1,61 +1,12 @@
 #:kivy 2.0.0
 
-# Screen:
-#     HomeScreen:
-#         id:home
-#         name:'home'
-# <HomeScreen>:
-#     FloatLayout:
-#         # Text fields
-#         MDTextFieldRect:
-#             hint_text: 'City'
-#             id : city_name
-#             pos_hint:{'top':.9,'left':1}
-#             size_hint: .5,.06
-#         MDTextFieldRect:
-#             hint_text: 'Country name or Country code'
-#             id : country_name
-#             pos_hint:{'top':.9,'right':1}
-#             size_hint: .5,.06
-
-#         MDRaisedButton:
-#             text: "Search Weather"
-#             pos_hint: {'center_x': .5, 'top': .7}
-#             size_hint: .3, .08
-#             on_release: root.search()
-
-#         MDLabel:
-#             text: f"Temperature: {root.temperature}"
-#             pos_hint: {'x': 0.1, 'y': 0.5}
-#             size_hint: .8, .05
-#             halign: "left"
-#         MDLabel:
-#             text: f"Description: {root.description}"
-#             pos_hint: {'x': 0.1, 'y': 0.40}
-#             size_hint: .8, .05
-#             halign: "left"
-#         MDLabel:
-#             text: f"Humidity: {root.humidity}"
-#             pos_hint: {'x': 0.1, 'y': 0.45}
-#             size_hint: .8, .05
-#             halign: "left"
-#         MDLabel:
-#             text: f"Pressure: {root.pressure}"
-#             pos_hint: {'x': 0.1, 'y': 0.5}
-#             size_hint: .8, .05
-#             halign: "right"
-#         MDLabel:
-#             text: f"Visibility: {root.visibility}"
-#             pos_hint: {'x': 0.1, 'y': 0.45}
-#             size_hint: .8, .05
-#             halign: "right"
-
 Screen:
     HomeScreen:
         id:home
         name:'home'
 
 <HomeScreen>:
+    # Box layout for the main screen
     BoxLayout:
         orientation: 'vertical'
         padding: 20
@@ -64,6 +15,7 @@ Screen:
         size: 500, 200
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
+        # Title label for the app
         Label:
             text: 'Weather App'
             font_size: 32
@@ -73,6 +25,7 @@ Screen:
             valign: 'middle'
             padding: 10
 
+        # Grid layout for text fields
         GridLayout:
             cols: 2
             size_hint_y: None
@@ -102,96 +55,23 @@ Screen:
             on_release: root.search()
             padding: 30
            
-        # # Weather details
-        # GridLayout:
-        #     cols: 2
-        #     size_hint_y: None
-        #     adaptive_size: True
-        #     spacing: 30
-
-        #     # Temperature
-        #     BoxLayout:
-        #         size_hint_y: None
-        #         adaptive_size: True
-        #         orientation: 'vertical'
-        #         MDLabel:
-        #             text: f"Temperature: {root.temperature}"
-        #             halign: "left"
-        #             valign: "middle"
-        #             size_hint_y: None
-        #             height: self.texture_size[1]
-
-        #     # Humidity
-        #     BoxLayout:
-        #         size_hint_y: None
-        #         adaptive_size: True
-        #         orientation: 'vertical'
-        #         MDLabel:
-        #             text: f"Humidity: {root.humidity}"
-        #             halign: "right"
-        #             valign: "middle"
-        #             size_hint_y: None
-        #             height: self.texture_size[1]
-
-        #     # Pressure
-        #     BoxLayout:
-        #         size_hint_y: None
-        #         adaptive_size: True
-        #         orientation: 'vertical'
-        #         MDLabel:
-        #             text: f"Pressure: {root.pressure}"
-        #             halign: "left"
-        #             valign: "middle"
-        #             size_hint_y: None
-        #             #height: self.texture_size[1]
-                    
-        #     # Visibility
-        #     BoxLayout:
-        #         size_hint_y: None
-        #         adaptive_size: True
-        #         orientation: 'vertical'
-        #         MDLabel:
-        #             text: f"Visibility: {root.visibility}"
-        #             halign: "right"
-        #             valign: "middle"
-        #             size_hint_y: None
-        #             #height: self.texture_size[1]
-                
-        #     # Description
-        #     BoxLayout:
-        #         size_hint_y: None
-        #         adaptive_size: True
-        #         orientation: 'vertical'
-        #         cols: 1
-        #         padding: [0, 10, 0, 0]
-
-        #         GridLayout:
-        #             cols: 1
-
-        #             MDLabel:
-        #                 text: f"Description: {root.description}"
-        #                 halign: "left"
-        #                 valign: "middle"
-        #                 size_hint_y: None
-        #                 height: self.texture_size[1]
-        #                 text_size: self.width, None
-        #                 pos_hint: {'center_x': .5}
-            
-        # Weather details
+        # Grid layout for the weather details
         GridLayout:
             cols: 2
             row_default_height: 50
             row_force_default: True
-            spacing: 20
-            padding: [30, 20]
+            spacing: 40
+            padding: 5
 
+            # Box layouts and labels for weather details
             # Temperature
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
                 height: 50
                 MDLabel:
-                    text: f"Temperature: {root.temperature}"
+                    text: f"[b]Temperature:[/b] {root.temperature}"
+                    markup: True
                     halign: "left"
                     valign: "middle"
                     size_hint_y: None
@@ -203,7 +83,8 @@ Screen:
                 size_hint_y: None
                 height: 50
                 MDLabel:
-                    text: f"Humidity: {root.humidity}"
+                    text: f"[b]Humidity:[/b] {root.humidity}"
+                    markup: True
                     halign: "right"
                     valign: "middle"
                     size_hint_y: None
@@ -215,7 +96,8 @@ Screen:
                 size_hint_y: None
                 height: 50
                 MDLabel:
-                    text: f"Pressure: {root.pressure}"
+                    text: f"[b]Pressure:[/b] {root.pressure}"
+                    markup: True
                     halign: "left"
                     valign: "middle"
                     size_hint_y: None
@@ -227,7 +109,8 @@ Screen:
                 size_hint_y: None
                 height: 50
                 MDLabel:
-                    text: f"Visibility: {root.visibility}"
+                    text: f"[b]Visibility:[/b] {root.visibility}"
+                    markup: True
                     halign: "right"
                     valign: "middle"
                     size_hint_y: None
@@ -236,11 +119,12 @@ Screen:
             # Description spanning both columns
             BoxLayout:
                 orientation: 'vertical'
-                size_hint: 2, None
-                height: self.minimum_height
+                size_hint: 1, None
+                adaptive_size: True
                 MDLabel:
-                    text: f"Description: {root.description}"
+                    text: f"[b]Description:[/b] {root.description}"
+                    markup: True
                     halign: "left"
                     valign: "middle"
-                    size_hint_y: None
+                    size_hint: 2, None
                     height: self.texture_size[1]

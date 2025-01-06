@@ -18,9 +18,12 @@ os.makedirs("db", exist_ok=True)
 # Initialize SQLite Database
 db_connection = sqlite3.connect(db_path)
 cursor = db_connection.cursor()
+
+# Remove the table if it already exists (used for testing)
 # cursor.execute("""
 #                DROP TABLE IF EXISTS weather_data
 #                 """)
+
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS weather_data (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,7 +38,6 @@ CREATE TABLE IF NOT EXISTS weather_data (
     UNIQUE(city, country)
     )
 """)
-
 db_connection.commit()
 
 # Firebase URL
@@ -132,8 +134,8 @@ class HomeScreen(Screen):
             print(f"Could not fetch data from Firebase: {e}")
             
         return fetched_data
-  
-           
+    
+      
     def fetch_sqlite_data(self, city_name, country_name, today_date):
         """
         Fetch data from the SQLite database.
@@ -210,7 +212,7 @@ class HomeScreen(Screen):
         
         return fetched_data
     
-            
+       
     def search(self):
         """
         Search for weather data for a city and country. Check database first, scrape if not available.
@@ -243,7 +245,7 @@ class HomeScreen(Screen):
                     except Exception as e:
                         print(f"Scraping error: {e}")
                         
-                                    
+                                                   
     def scrape_data(self, city_name, country_name):
         """
         Scrape weather data from the website for the given city & country.
@@ -307,7 +309,7 @@ class HomeScreen(Screen):
             print(f"Scraping error: {e}")
             return None
      
-          
+                
     def store_data(self, city_name, country_name, data):   
         """ 
         Store scraped data in SQLite, Firebase, and text file.
@@ -383,9 +385,9 @@ class HomeScreen(Screen):
                 file.write(json.dumps(data) + "\n")
                 print("Scraped data successfully stored in txt file.")
         except Exception as e:
-            print(f"Txt file storage error: {e}")
+            print(f"Txt file storage error: {e}") 
     
-            
+        
     def update_data(self, city_name, country_name, data):
         """
         Update the weather data in the databases (SQLite, Firebase, and txt file).
@@ -436,10 +438,9 @@ class HomeScreen(Screen):
                 db_connection.commit()
                 print("SQLite data successfully updated.") 
             except Exception as e:
-                print(f"SQLite update error: {e}")
-    
-        # Explain why we dont update the txt file in the presentation    
+                print(f"SQLite update error: {e}")  
         try:
+            # Update txt file
             file_path = "db/weather_data.txt"
             updated = False
             data_list = []
@@ -473,7 +474,7 @@ class HomeScreen(Screen):
         except Exception as e:
             print(f"Txt file update error: {e}")
             
-            
+                   
     def update_UI(self, data):
         """
         Update the UI with the scraped weather data.
@@ -497,6 +498,6 @@ class HomeScreen(Screen):
 class MainApp(MDApp):
     def build(self, **kwargs):
         self.theme_cls.theme_style = "Dark"
-        Window.size = (500, 600)
+        Window.size = (500, 700)
 
-MainApp().run()
+MainApp().run() 

@@ -7,14 +7,13 @@
 5. Your reflection on the tasks
 
 # To do list:
-
-- Snygga till UI (kivy), lägga till grid exempelvis
-- Eventuellt adda converters för Farenheit --> Celsius + inHG --> mBar + miles --> km (för att kringgå wunderbaums amerikanska SHIT)
-
+- Eventuellt adda converters för Farenheit --> Celsius + inHG --> mBar + miles --> km (för att kringgå wunderbaums amerikanska SHIT) (Optional)
+- Bryt ut update_data till separata funktion för varje databas (Optional)
 
 # Done:
-- Fixa så att inte txtfilen dubbellagrar?
-- Bryt ut "fetch_firebase/SQLite/txt etc till egna funktioner.
+- Snygga till UI (kivy), lägga till grid exempelvis CHECK
+- Fixa så att inte txtfilen dubbellagrar? CHECK
+- Bryt ut "fetch_firebase/SQLite/txt etc till egna funktioner. CHECK
 - Se till så att alla typer av lagring kan nås om det behövs, se till så alla backups fungerar för att undvika errors och krascher
 - Felmedelanden CHECK
 - Kolla över när man söker på hela landet istället för endast landskoden i wunderground [/weather/sweden/kumla] ist för [/weather/se/sater], description saknas då och temperature blir "--" CHECK! 

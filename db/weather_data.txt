@@ -1,3 +1,5 @@
 {"temperature": "11\u00a0\u00b0F", "description": "Today's temperature is forecast to be MUCH WARMER than yesterday.", "pressure": "29.56\u00a0in", "visibility": "6\u00a0miles", "humidity": "92\u00a0%", "city": "sater", "country": "sweden", "timestamp": "2025-01-06"}
 {"temperature": "11\u00a0\u00b0F", "description": "Today's temperature is forecast to be MUCH WARMER than yesterday.", "pressure": "29.56\u00a0in", "visibility": "7\u00a0miles", "humidity": "90\u00a0%", "city": "borlange", "country": "sweden", "timestamp": "2025-01-06"}
 {"temperature": "-5\u00a0\u00b0C", "description": "Light snow. Broken clouds.", "pressure": "1000 mbar", "visibility": "6\u00a0km", "humidity": "93%", "city": "stockholm", "country": "sweden", "timestamp": "2025-01-06"}
+{"temperature": "-6\u00a0\u00b0C", "description": "Scattered clouds.", "pressure": "996 mbar", "visibility": "N/A", "humidity": "93%", "city": "orebro", "country": "sweden", "timestamp": "2025-01-06"}
+{"temperature": "26\u00a0\u00b0C", "description": "Haze.", "pressure": "1013 mbar", "visibility": "2\u00a0km", "humidity": "50%", "city": "mumbai", "country": "india", "timestamp": "2025-01-06"}
