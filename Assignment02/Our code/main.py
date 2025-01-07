@@ -43,6 +43,7 @@ db_connection.commit()
 # Firebase URL
 firebase_url = 'https://assignment2-gik2nx-cc2bd-default-rtdb.europe-west1.firebasedatabase.app/.json'
 
+# db_connection.close()
 
 class HomeScreen(Screen):
     """
@@ -143,7 +144,9 @@ class HomeScreen(Screen):
         fetched_data = False
         
         if not self.is_db_connection_open():
-                    print("SQLite connection is closed. Attempting secondary sources...")
+            print("SQLite connection is closed. Attempting secondary sources...")
+            return fetched_data
+        
         else:
             try:
                 print("Checking SQLite for data...")   
@@ -191,7 +194,6 @@ class HomeScreen(Screen):
                     data = json.loads(line.strip())
                     if data["city"] == city_name and data["country"] == country_name:
                         timestamp = datetime.strptime(data["timestamp"], '%Y-%m-%d').date()
-                        # if timestamp.date() < datetime.now.date():
                         if timestamp < today_date:
                             print("Text file data is outdated. Scraping new data...")
                             scraped_data = self.scrape_data(city_name, country_name)
@@ -212,7 +214,7 @@ class HomeScreen(Screen):
         
         return fetched_data
     
-       
+    
     def search(self):
         """
         Search for weather data for a city and country. Check database first, scrape if not available.
